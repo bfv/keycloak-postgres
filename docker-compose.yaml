@@ -23,6 +23,6 @@ services:
       - KC_HTTP_ENABLED=true
     entrypoint: ["/opt/keycloak/bin/kc.sh", "start"]
     ports:
-      - 8446:8443
+      - 8443:8443
     depends_on:
       - postgres

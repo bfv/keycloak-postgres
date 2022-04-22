@@ -13,6 +13,19 @@ RUN curl -sL https://github.com/aerogear/keycloak-metrics-spi/releases/download/
 RUN /opt/keycloak/bin/kc.sh build
 
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+
+ARG BUILD_DATE
+ARG KEYCLOAK_VERSION
+
+LABEL org.label-schema.schema-version="1.0"
+LABEL org.label-schema.build-date="${BUILD_DATE}"
+LABEL org.label-schema.name="keycloak-postgres"
+LABEL org.label-schema.description="A purposely built image on top of quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}, set up for Postgres db"
+LABEL org.label-schema.vcs-url="https://github.com/bfv/keycloak-postgres"
+LABEL org.label-schema.vendor="bfv.io"
+
+LABEL maintainer="dev@bfv.io"
+
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 WORKDIR /opt/keycloak
 
