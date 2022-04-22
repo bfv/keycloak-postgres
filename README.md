@@ -4,7 +4,7 @@
 The `.env` file is used for both building the custom keycloak image as well as for running it all together with Docker compose.
 Copy `.env-template` to `.env` and modify the values.
 
-# Building the custom Keycloak image
+## Building the custom Keycloak image
 In order for the JDBC drivers to initialized (among other things) you first need to build a custom image based on `quay.io/keycloak/keycloak`. This can be done by executing `./build.sh`. Windows users utilize WSL2 for this. 
 
 ## first use
