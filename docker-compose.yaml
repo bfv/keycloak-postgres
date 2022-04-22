@@ -1,0 +1,28 @@
+
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    volumes:
+      - ${POSTGRES_VOLUME_PATH}:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  keycloak:
+    image: ${KEYCLOAK_IMAGE_NAME}:${KEYCLOAK_VERSION}
+    # for remote images only:
+    # pull_policy: always
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak?ssl=allow
+      - KC_DB_USERNAME=${POSTGRES_USER}
+      - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
+      - KC_HOSTNAME=${KEYCLOAK_HOSTNAME}
+      - KC_HOSTNAME_STRICT=true
+      - KC_HTTP_ENABLED=true
+    entrypoint: ["/opt/keycloak/bin/kc.sh", "start"]
+    ports:
+      - 8446:8443
+    depends_on:
+      - postgres
