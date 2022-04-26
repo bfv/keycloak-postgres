@@ -21,7 +21,10 @@ services:
       - KC_HOSTNAME=${KEYCLOAK_HOSTNAME}
       - KC_HOSTNAME_STRICT=true
       - KC_HTTP_ENABLED=true
-    entrypoint: ["/opt/keycloak/bin/kc.sh", "start"]
+    volumes:
+      - c:/docker/keycloak/certs/cert.pem:/etc/x509/https/cert.pem
+      - c:/docker/keycloak/certs/privkey.pem:/etc/x509/https/privkey.pem
+    entrypoint: ["/opt/keycloak/bin/kc.sh", "start", "--https-certificate-file", "/etc/x509/https/cert.pem", "--https-certificate-key-file", "/etc/x509/https/privkey.pem"]
     ports:
       - 8443:8443
     depends_on:
