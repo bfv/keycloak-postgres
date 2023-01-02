@@ -16,14 +16,15 @@ services:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
       - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak?ssl=allow
+      - KC_DB=postgres
       - KC_DB_USERNAME=${POSTGRES_USER}
       - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
       - KC_HOSTNAME=${KEYCLOAK_HOSTNAME}
       - KC_HOSTNAME_STRICT=true
       - KC_HTTP_ENABLED=true
     volumes:
-      - c:/docker/keycloak/certs/cert.pem:/etc/x509/https/cert.pem
-      - c:/docker/keycloak/certs/privkey.pem:/etc/x509/https/privkey.pem
+      - ${CERTDIR}/cert.pem:/etc/x509/https/cert.pem
+      - ${CERTDIR}/privkey.pem:/etc/x509/https/privkey.pem
     entrypoint: ["/opt/keycloak/bin/kc.sh", "start", "--https-certificate-file", "/etc/x509/https/cert.pem", "--https-certificate-key-file", "/etc/x509/https/privkey.pem"]
     ports:
       - 8443:8443
