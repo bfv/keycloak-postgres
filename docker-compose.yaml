@@ -1,5 +1,6 @@
 
 services:
+
   postgres:
     image: ${POSTGRES_IMAGE}
     volumes:
@@ -8,24 +9,52 @@ services:
       - POSTGRES_DB=keycloak
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal-network
+
   keycloak:
     image: ${KEYCLOAK_IMAGE_NAME}:${KEYCLOAK_VERSION}
+    container_name: keycloak
     # for remote images only:
     # pull_policy: always
     environment:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB=postgres
       - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak?ssl=allow
       - KC_DB_USERNAME=${POSTGRES_USER}
       - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
       - KC_HOSTNAME=${KEYCLOAK_HOSTNAME}
-      - KC_HOSTNAME_STRICT=true
+      - KC_HOSTNAME_STRICT=false
       - KC_HTTP_ENABLED=true
+      - QUARKUS_HTTP_ACCESS_LOG_ENABLED=true
+      - KC_LOGLEVEL=DEBUG
     volumes:
-      - c:/docker/keycloak/certs/cert.pem:/etc/x509/https/cert.pem
-      - c:/docker/keycloak/certs/privkey.pem:/etc/x509/https/privkey.pem
-    entrypoint: ["/opt/keycloak/bin/kc.sh", "start", "--https-certificate-file", "/etc/x509/https/cert.pem", "--https-certificate-key-file", "/etc/x509/https/privkey.pem"]
+      - ./certs/cert.pem:/etc/x509/https/cert.pem
+      #- ${CERT_PATH}/certs/chain.pem:/etc/x509/https/cert.pem
+      - ./certs/privkey.pem:/etc/x509/https/privkey.pem
+    entrypoint: ["/opt/keycloak/bin/kc.sh", "start", "--https-certificate-file", "/etc/x509/https/cert.pem", "--https-certificate-key-file", "/etc/x509/https/privkey.pem", "--optimized", "--verbose"]
     ports:
       - 8443:8443
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    networks:
+      ext-network:
+        aliases:
+          - ${KEYCLOAK_HOSTNAME}
+      internal-network:
+
+networks:
+  ext-network:
+    name: ext-network
+    external: true
+  internal-network:
+    name: internal-network
+    external: false
+      

@@ -1,18 +1,16 @@
 
-ARG KEYCLOAK_VERSION
+ARG KEYCLOAK_VERSION=latest
 
-FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION as builder
+FROM keycloak/keycloak:$KEYCLOAK_VERSION AS builder
 
 ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
 ENV KC_FEATURES=token-exchange
 ENV KC_DB=postgres
 
-# Install custom providers
-RUN curl -sL https://github.com/aerogear/keycloak-metrics-spi/releases/download/2.5.3/keycloak-metrics-spi-2.5.3.jar -o /opt/keycloak/providers/keycloak-metrics-spi-2.5.3.jar
 RUN /opt/keycloak/bin/kc.sh build
 
-FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+FROM keycloak/keycloak:$KEYCLOAK_VERSION
 
 ARG BUILD_DATE
 ARG KEYCLOAK_VERSION
